@@ -30,8 +30,16 @@ Unwind() {
 	fi
 }
 
+CreateSetup()
+{
+	V=$1
+	shift
+	eval $V=\"\"
+}
+
 Install() {
-	local ACTIONS="$@"
+	eval __LOCAL_ACTIONS="\$$1"
+	local ACTIONS="$__LOCAL_ACTIONS"
 	local IFS=$'\n'
 	for ACTION in $ACTIONS; do
 		Exec "$ACTION"
@@ -48,7 +56,8 @@ $UNWIND_ACTIONS"
 }
 
 Uninstall() {
-	local ACTIONS="$@"
+	eval __LOCAL_ACTIONS="\$$1"
+	local ACTIONS="$__LOCAL_ACTIONS"
 	local IFS=$'\n'
 	for ACTION in $ACTIONS; do
 		local UNWIND_ACTIONS="$ACTION
