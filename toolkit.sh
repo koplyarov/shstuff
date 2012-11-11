@@ -24,31 +24,52 @@ RemoveDots() {
 
 Log() {
 	case $1 in
-	"Info"*)
-		local LOGLEVEL="[$1]"
-		local MSGCOLOR=$COL_GREEN
-		shift
-		;;
-	"Warning"*)
-		local LOGLEVEL="[$1]"
-		local MSGCOLOR=$COL_YELLOW
-		shift
-		;;
-	"Error"*)
-		local LOGLEVEL="[$1]"
-		local MSGCOLOR=$COL_RED
-		shift
-		;;
-	*)
-		local LOGLEVEL="[Info]"
-		local MSGCOLOR=$COL_GREEN
-		;;
+	"Info")		local LOGLEVEL="[$1]";		local MSGCOLOR=$COL_GREEN;	shift ;;
+	"Warning")	local LOGLEVEL="[$1]";		local MSGCOLOR=$COL_YELLOW;	shift ;;
+	"Error")	local LOGLEVEL="[$1]";		local MSGCOLOR=$COL_RED;	shift ;;
+	*)			local LOGLEVEL="[Info]";	local MSGCOLOR=$COL_GREEN;	;;
 	esac
 
+	local NO_LINEFEED=0
+	local NO_PREAMBLE=0
 	if [ $COLORED_LOGS -ne 0 ]; then
-		echo -e $COL_MAGENTA"{vimstuff setup} "$MSGCOLOR"$LOGLEVEL"$COL_RESET "$*" >&2
+		for ARG in "$@"; do
+			case "$ARG" in
+			"Log_ColoredMsg") echo -e -n $MSGCOLOR>&2 ;;
+			"Log_NoLineFeed") local NO_LINEFEED=1 ;;
+			"Log_NoPreamble") local NO_PREAMBLE=1 ;;
+			*)
+				if [ $NO_PREAMBLE -eq 0 ]; then
+					echo -e -n $COL_MAGENTA"{vimstuff setup} "$MSGCOLOR"$LOGLEVEL"$COL_RESET>&2
+					local NO_PREAMBLE=1
+				fi
+				echo -n " $ARG">&2
+				;;
+			esac
+		done
+		if [ $NO_LINEFEED -eq 0 ]; then
+			echo -e $COL_RESET>&2
+		else
+			echo -e -n $COL_RESET>&2
+		fi
 	else
-		echo "{vimstuff setup} $LOGLEVEL$*" >&2
+		for ARG in "$@"; do
+			case "$ARG" in
+			"Log_ColoredMsg") ;;
+			"Log_NoLineFeed") local NO_LINEFEED=1 ;;
+			"Log_NoPreamble") local NO_PREAMBLE=1 ;;
+			*)
+				if [ $NO_PREAMBLE -eq 0 ]; then
+					echo -n "{vimstuff setup} $LOGLEVEL">&2
+					local NO_PREAMBLE=1
+				fi
+				echo -n " $ARG">&2
+				;;
+			esac
+		done
+		if [ $NO_LINEFEED -eq 0 ]; then
+			echo>&2
+		fi
 	fi
 }
 
