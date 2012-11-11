@@ -1,6 +1,5 @@
 #!/bin/bash
 
-. "`dirname $0`/toolkit.sh"
 
 Exec() {
 	local IFS=$' '
