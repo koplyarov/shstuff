@@ -1,6 +1,8 @@
 LINEFEED="
 "
 
+LOGGER_SCRIPTNAME="Your script"
+
 COLORED_LOGS=1
 if [ "`echo -e`" ]; then
 	COLORED_LOGS=0
@@ -40,7 +42,7 @@ Log() {
 			"Log_NoPreamble") local NO_PREAMBLE=1 ;;
 			*)
 				if [ $NO_PREAMBLE -eq 0 ]; then
-					echo -e -n $COL_MAGENTA"{vimstuff setup} "$MSGCOLOR"$LOGLEVEL"$COL_RESET>&2
+					echo -e -n $COL_MAGENTA"{$LOGGER_SCRIPTNAME} "$MSGCOLOR"$LOGLEVEL"$COL_RESET>&2
 					local NO_PREAMBLE=1
 				fi
 				echo -n " $ARG">&2
@@ -60,7 +62,7 @@ Log() {
 			"Log_NoPreamble") local NO_PREAMBLE=1 ;;
 			*)
 				if [ $NO_PREAMBLE -eq 0 ]; then
-					echo -n "{vimstuff setup} $LOGLEVEL">&2
+					echo -n "{$LOGGER_SCRIPTNAME} $LOGLEVEL">&2
 					local NO_PREAMBLE=1
 				fi
 				echo -n " $ARG">&2
