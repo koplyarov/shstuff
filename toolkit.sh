@@ -1,55 +1,54 @@
+LINEFEED="
+"
+
+COLORED_LOGS=1
+if [ "`echo -e`" ]; then
+	COLORED_LOGS=0
+fi
+
 DELIM='==============================================='
-ESC_SEQ="\x1b["
-COL_RESET=$ESC_SEQ"39;49;00m"
-COL_RED=$ESC_SEQ"31;01m"
-COL_GREEN=$ESC_SEQ"32;01m"
-COL_YELLOW=$ESC_SEQ"33;01m"
-COL_BLUE=$ESC_SEQ"34;01m"
-COL_MAGENTA=$ESC_SEQ"35;01m"
-COL_CYAN=$ESC_SEQ"36;01m"
+if [ $COLORED_LOGS -ne 0 ]; then
+	ESC_SEQ="\x1b["
+	COL_RESET=$ESC_SEQ"39;49;00m"
+	COL_RED=$ESC_SEQ"31;01m"
+	COL_GREEN=$ESC_SEQ"32;01m"
+	COL_YELLOW=$ESC_SEQ"33;01m"
+	COL_BLUE=$ESC_SEQ"34;01m"
+	COL_MAGENTA=$ESC_SEQ"35;01m"
+	COL_CYAN=$ESC_SEQ"36;01m"
+fi
 
 RemoveDots() {
 	echo $* | sed 's@/\./@/@g' | sed 's@/\.$@@g'
 }
 
 Log() {
-	if [ "`basename $SHELL`" != "bash" ]; then
-		case $1 in
-		"Info"*)
-			;;
-		"Warning"*)
-			;;
-		"Error"*)
-			;;
-		*)
-			LOGLEVEL="[Info] "
-			;;
-		esac
-		echo "{vimstuff setup} $LOGLEVEL$*" >&2
-	else	
-		case $1 in
-		"Info"*)
-			LOGLEVEL="[$1]"
-			MSGCOLOR=$COL_GREEN
-			shift
-			;;
-		"Warning"*)
-			LOGLEVEL="[$1]"
-			MSGCOLOR=$COL_YELLOW
-			shift
-			;;
-		"Error"*)
-			LOGLEVEL="[$1]"
-			MSGCOLOR=$COL_RED
-			shift
-			;;
-		*)
-			LOGLEVEL="[Info]"
-			MSGCOLOR=$COL_GREEN
-			;;
-		esac
+	case $1 in
+	"Info"*)
+		LOGLEVEL="[$1]"
+		MSGCOLOR=$COL_GREEN
+		shift
+		;;
+	"Warning"*)
+		LOGLEVEL="[$1]"
+		MSGCOLOR=$COL_YELLOW
+		shift
+		;;
+	"Error"*)
+		LOGLEVEL="[$1]"
+		MSGCOLOR=$COL_RED
+		shift
+		;;
+	*)
+		LOGLEVEL="[Info]"
+		MSGCOLOR=$COL_GREEN
+		;;
+	esac
 
+	if [ $COLORED_LOGS -ne 0 ]; then
 		echo -e $COL_MAGENTA"{vimstuff setup} "$MSGCOLOR"$LOGLEVEL"$COL_RESET "$*" >&2
+	else
+		echo "{vimstuff setup} $LOGLEVEL$*" >&2
 	fi
 }
 
