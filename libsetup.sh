@@ -40,7 +40,7 @@ Install() {
 			for UNWIND_ACTION in $UNWIND_ACTIONS; do
 				Unwind "$UNWIND_ACTION"
 			done
-			break
+			return 1
 		fi
 		local UNWIND_ACTIONS="$ACTION
 $UNWIND_ACTIONS"
