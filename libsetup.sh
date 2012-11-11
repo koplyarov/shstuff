@@ -21,7 +21,7 @@ Unwind() {
 	local IFS=$' '
 	local ACTION="$@"
 	local MSG=`eval msg_$ACTION`
-	Log Log_NoLineFeed "Unwinding $ACTION..."
+	Log Log_NoLineFeed "Unwinding '$MSG'..."
 	__LOCAL_OUT=`eval undo_$ACTION 2>&1`
 	if [ $? -eq 0 ]; then
 		Log Log_NoPreamble Log_ColoredMsg " OK"
