@@ -25,23 +25,23 @@ RemoveDots() {
 Log() {
 	case $1 in
 	"Info"*)
-		LOGLEVEL="[$1]"
-		MSGCOLOR=$COL_GREEN
+		local LOGLEVEL="[$1]"
+		local MSGCOLOR=$COL_GREEN
 		shift
 		;;
 	"Warning"*)
-		LOGLEVEL="[$1]"
-		MSGCOLOR=$COL_YELLOW
+		local LOGLEVEL="[$1]"
+		local MSGCOLOR=$COL_YELLOW
 		shift
 		;;
 	"Error"*)
-		LOGLEVEL="[$1]"
-		MSGCOLOR=$COL_RED
+		local LOGLEVEL="[$1]"
+		local MSGCOLOR=$COL_RED
 		shift
 		;;
 	*)
-		LOGLEVEL="[Info]"
-		MSGCOLOR=$COL_GREEN
+		local LOGLEVEL="[Info]"
+		local MSGCOLOR=$COL_GREEN
 		;;
 	esac
 
@@ -81,9 +81,9 @@ CreateLink() {
 }
 
 ClearLink() {
-	SRC=`readlink $2`
+	__LOCAL_SRC=`readlink $2`
 	if [ $? -eq 0 ]; then
-		if [ "$SRC" = "$1" ]; then
+		if [ "$__LOCAL_SRC" = "$1" ]; then
 			Log "Removing $2 -> $1"
 			Try rm $2
 		else
@@ -125,9 +125,9 @@ AddLine() {
 }
 
 RemoveLine() {
-	TEMPFILE1=`tempfile`
+	local TEMPFILE1=`tempfile`
 	if grep -xvF "$2" "$1" > $TEMPFILE1; then
-		TEMPFILE2=`tempfile`
+		local TEMPFILE2=`tempfile`
 		Try mv "$1" $TEMPFILE2
 		if mv $TEMPFILE1 "$1"; then
 			rm $TEMPFILE2
