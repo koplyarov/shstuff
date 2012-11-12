@@ -138,6 +138,11 @@ RevertPatch() {
 }
 
 
+EscapeForSed() {
+	echo "$@" | sed 's/\([].\/\\$^*&[]\)/\\\1/g'
+}
+
+
 AddLine() {
 	echo "$2" >> $1
 	if [ $? -eq 0 ]; then
