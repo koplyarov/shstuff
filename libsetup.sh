@@ -16,11 +16,11 @@ Exec() {
 	fi
 }
 
-Unwind() {
+Revert() {
 	local IFS=$' '
 	local ACTION="$@"
 	local MSG=`eval msg_$ACTION`
-	Log Log_NoLineFeed "Unwinding '$MSG'..."
+	Log Log_NoLineFeed "Reverting '$MSG'..."
 	__LOCAL_OUT=`eval undo_$ACTION 2>&1`
 	if [ $? -eq 0 ]; then
 		Log Log_NoPreamble Log_ColoredMsg " OK"
@@ -46,7 +46,7 @@ Install() {
 		if [ $? -ne 0 ]; then
 			local IFS=$'\n'
 			for UNWIND_ACTION in $UNWIND_ACTIONS; do
-				Unwind "$UNWIND_ACTION"
+				Revert "$UNWIND_ACTION"
 			done
 			return 1
 		fi
@@ -66,7 +66,7 @@ $UNWIND_ACTIONS"
 
 	local IFS=$'\n'
 	for UNWIND_ACTION in $UNWIND_ACTIONS; do
-		Unwind "$UNWIND_ACTION"
+		Revert "$UNWIND_ACTION"
 	done
 }
 
