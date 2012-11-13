@@ -2,7 +2,7 @@
 
 
 Exec() {
-	local IFS=$' '
+	local IFS=" "
 	local MSG=`eval msg_$ACTION`
 	Log Log_NoLineFeed "$MSG..."
 	__LOCAL_OUT=`eval do_$ACTION 2>&1`
@@ -17,7 +17,7 @@ Exec() {
 }
 
 Revert() {
-	local IFS=$' '
+	local IFS=" "
 	local ACTION="$@"
 	local MSG=`eval msg_$ACTION`
 	Log Log_NoLineFeed "Reverting '$MSG'..."
@@ -25,7 +25,7 @@ Revert() {
 	if [ $? -eq 0 ]; then
 		Log Log_NoPreamble Log_ColoredMsg " OK"
 	else
-		Log Log_NoPreamble Log_ColoredMsg Warning " Fail!"
+		Log Warning Log_NoPreamble Log_ColoredMsg " Fail!"
 		Log Warning "$__LOCAL_OUT"
 	fi
 }
@@ -40,31 +40,27 @@ CreateSetup()
 Install() {
 	eval __LOCAL_ACTIONS="\$$1"
 	local ACTIONS="$__LOCAL_ACTIONS"
-	local IFS=$'\n'
+	local IFS="$LINEFEED"
 	for ACTION in $ACTIONS; do
 		Exec "$ACTION"
 		if [ $? -ne 0 ]; then
-			local IFS=$'\n'
+			local IFS="$LINEFEED"
 			for UNWIND_ACTION in $UNWIND_ACTIONS; do
 				Revert "$UNWIND_ACTION"
 			done
 			return 1
 		fi
-		local UNWIND_ACTIONS="$ACTION
-$UNWIND_ACTIONS"
+		local UNWIND_ACTIONS="${ACTION}${LINEFEED}${UNWIND_ACTIONS}"
 	done
 }
 
 Uninstall() {
 	eval __LOCAL_ACTIONS="\$$1"
 	local ACTIONS="$__LOCAL_ACTIONS"
-	local IFS=$'\n'
+	local IFS="$LINEFEED"
 	for ACTION in $ACTIONS; do
-		local UNWIND_ACTIONS="$ACTION
-$UNWIND_ACTIONS"
+		local UNWIND_ACTIONS="${ACTION}${LINEFEED}${UNWIND_ACTIONS}"
 	done
-
-	local IFS=$'\n'
 	for UNWIND_ACTION in $UNWIND_ACTIONS; do
 		Revert "$UNWIND_ACTION"
 	done
