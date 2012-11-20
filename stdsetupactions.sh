@@ -14,6 +14,10 @@ msg_Cp() { echo "Copying $1 to $2"; }
 do_Cp() { cp $1 $2; }
 undo_Cp() { rm $2; }
 
+msg_CpDir() { echo "Copying $1 to $2"; }
+do_CpDir() { cp -r $1 $2; }
+undo_CpDir() { rm -rf $2; }
+
 msg_Mv() { echo "Moving $1 to $2"; }
 do_Mv() { mv $1 $2; }
 undo_Mv() { mv $2 $1; }
