@@ -88,6 +88,28 @@ Try() {
 	fi
 }
 
+GetLinuxDistributorId() {
+	if which lsb_release >/dev/null 2>/dev/null; then
+		lsb_release -is
+	else
+		Log Error "lsb_release utility not found!"
+		return 1
+	fi
+}
+
+CheckLinuxPackage() {
+	local ID=`GetLinuxDistributorId`
+	case $ID in
+	"Ubuntu")
+		dpkg -s $1 >/dev/null 2>/dev/null
+		;;
+	*)
+		Log Error "Unknown linux distribution!"
+		return 2
+		;;
+	esac
+}
+
 MkDirIfAbsent() {
 	if [ ! -e $1 ]; then
 		Log "Creating directory $1"
