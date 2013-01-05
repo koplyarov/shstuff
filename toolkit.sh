@@ -97,9 +97,12 @@ GetLinuxDistributorId() {
 	fi
 }
 
+SHSTUFF_LINUX_DISTRIB_ID=""
 CheckLinuxPackage() {
-	local ID=`GetLinuxDistributorId`
-	case $ID in
+	if [ -z "$SHSTUFF_LINUX_DISTRIB_ID" ]; then
+		SHSTUFF_LINUX_DISTRIB_ID=`GetLinuxDistributorId`
+	fi
+	case $SHSTUFF_LINUX_DISTRIB_ID in
 	"Ubuntu")
 		dpkg -s $1 >/dev/null 2>/dev/null
 		;;
