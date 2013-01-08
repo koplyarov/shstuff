@@ -92,6 +92,27 @@ Try() {
 	fi
 }
 
+ParseArguments() {
+	if [ $# -lt 1 ]; then
+		Log Error "No argument parsing function passed to ParseArguments!"
+		return 2
+	fi
+	local PARSE_FUNC="$1"
+	local ARGNUM=0
+	shift
+	while [ $# -gt 0 ]; do
+		$PARSE_FUNC "$@"
+		local RESULT="$?"
+		if [ $RESULT -eq 255 ]; then
+			Log Error "Error handling argument #$ARGNUM ($1)!"
+			return 1
+		fi
+		shift
+		shift $RESULT
+		local ARGNUM=`echo "$ARGNUM+$RESULT+1" | bc`
+	done
+}
+
 SetCacheParam() {
 	if [ $# -le 2 ]; then
 		Log Error "Too few arguments for SetCacheParam!"
