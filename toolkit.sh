@@ -32,17 +32,21 @@ Log() {
 	*)			local LOGLEVEL="[Info]";	local MSGCOLOR=$COL_GREEN;	;;
 	esac
 
+	local COLORED_MSG=0
 	local NO_LINEFEED=0
 	local NO_PREAMBLE=0
 	if [ $COLORED_LOGS -ne 0 ]; then
 		for ARG in "$@"; do
 			case "$ARG" in
-			"Log_ColoredMsg") echo -e -n $MSGCOLOR>&2 ;;
+			"Log_ColoredMsg") local COLORED_MSG=1 ;;
 			"Log_NoLineFeed") local NO_LINEFEED=1 ;;
 			"Log_NoPreamble") local NO_PREAMBLE=1 ;;
 			*)
 				if [ $NO_PREAMBLE -eq 0 ]; then
-					echo -e -n $COL_MAGENTA"{$LOGGER_SCRIPTNAME} "$MSGCOLOR"$LOGLEVEL"$COL_RESET>&2
+					echo -e -n $COL_MAGENTA"{$LOGGER_SCRIPTNAME} "$MSGCOLOR"$LOGLEVEL">&2
+					if [ $COLORED_MSG -eq 0 ]; then
+						echo -e -n $COL_RESET>&2
+					fi
 					local NO_PREAMBLE=1
 				fi
 				echo -n " $ARG">&2
