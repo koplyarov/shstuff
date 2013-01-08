@@ -92,6 +92,81 @@ Try() {
 	fi
 }
 
+SetCacheParam() {
+	if [ $# -le 2 ]; then
+		Log Error "Too few arguments for SetCacheParam!"
+		return 1
+	fi
+	local NAME=CACHE_$1
+	case $2 in
+	"Autosave"|"Savefile")	local CACHE_PARAM=${NAME}_PARAM_$2 ;;
+	*)						Log Error "Invalid cache parameter: $2"; return 2 ;;
+	esac
+	shift 2
+	eval $CACHE_PARAM=\""$@"\"
+}
+
+GetCacheParam() {
+	if [ $# -ne 2 ]; then
+		Log Error "Invalid number of arguments for GetCacheParam!"
+		return 1
+	fi
+	local NAME=CACHE_$1
+	case $2 in
+	"Autosave"|"Savefile")	local CACHE_PARAM=${NAME}_PARAM_$2 ;;
+	*)						Log Error "Invalid cache parameter: $2"; return 2 ;;
+	esac
+	shift 2
+	eval echo \"\$$CACHE_PARAM\"
+}
+
+
+CreateCache() {
+	SetCacheParam $1 Autosave 0
+	SetCacheParam $1 Savefile ".cache_$1"
+}
+
+CacheLoad() {
+	if [ $# -lt 1 -o $# -gt 2 ]; then
+		Log Error "Invalid parameters count for CacheLoad!"
+	fi
+	local FILE=`GetCacheParam $1 Savefile`
+	if [ $# -eq 2 ]; then
+		local FILE=$2
+	fi
+	local NAME=CACHE_$1
+	eval "$NAME=\"`cat $FILE 2>/dev/null`\""
+}
+
+CacheGetContent() {
+	local NAME=CACHE_$1
+	eval echo \"\$$NAME\"
+}
+
+CacheHit() {
+	if [ $# -ne 2 ]; then
+		Log Warning "Invalid parameters count for CacheHit!"
+		return 0
+	fi
+	if CacheCheck $1 $2; then
+		return 0
+	fi
+	local NAME=CACHE_$1
+	eval "$NAME=\"`CacheGetContent $1`$LINEFEED$2\""
+	if [ `GetCacheParam $1 Autosave` -ne 0 ]; then
+		CacheGetContent $1 > `GetCacheParam $1 Savefile`
+	fi
+	return 0
+}
+
+CacheCheck() {
+	if [ $# -ne 1 ]; then
+		Log Warning "Invalid parameters count for CacheCheck!"
+		return 1
+	fi
+	CacheGetContent $1 | grep -Fx "$2" >/dev/null 2>/dev/null
+}
+
 GetLinuxDistributorId() {
 	if which lsb_release >/dev/null 2>/dev/null; then
 		lsb_release -is
