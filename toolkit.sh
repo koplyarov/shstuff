@@ -113,6 +113,10 @@ ParseArguments() {
 	done
 }
 
+CheckSuperuser() {
+	[ $UID -eq 0 ];
+}
+
 SetCacheParam() {
 	if [ $# -le 2 ]; then
 		Log Error "Too few arguments for SetCacheParam!"
