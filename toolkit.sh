@@ -86,31 +86,23 @@ Fail() {
 	exit 1
 }
 
+# Deprecated!
 Try() {
-	"$@"
-	if [ $? -ne 0 ]; then
-		Fail "$* failed!"
-	fi
+	"$@" || Fail "$* failed!"
 }
 
 ParseArguments() {
-	if [ $# -lt 1 ]; then
-		Log Error "No argument parsing function passed to ParseArguments!"
-		return 2
-	fi
+	[ $# -ge 1 ] || { Log Error "No argument parsing function passed to ParseArguments!"; return 2; }
 	local PARSE_FUNC="$1"
 	local ARGNUM=0
 	shift
 	while [ $# -gt 0 ]; do
 		$PARSE_FUNC "$@"
 		local RESULT="$?"
-		if [ $RESULT -eq 255 ]; then
-			Log Error "Error handling argument #$ARGNUM ($1)!"
-			return 1
-		fi
+		[ $RESULT -eq 255 ] && { Log Error "Error handling argument #$ARGNUM ($1)!"; return 1; }
 		shift
 		shift $RESULT
-		local ARGNUM=`echo "$ARGNUM+$RESULT+1" | bc`
+		ARGNUM=`echo "$ARGNUM+$RESULT+1" | bc`
 	done
 }
 
@@ -119,30 +111,22 @@ CheckSuperuser() {
 }
 
 SetCacheParam() {
-	if [ $# -le 2 ]; then
-		Log Error "Too few arguments for SetCacheParam!"
-		return 1
-	fi
+	[ $# -eq 3 ] || { Log Error "Invalid number of arguments for SetCacheParam!"; return 1; }
 	local NAME=CACHE_$1
 	case $2 in
 	"Autosave"|"Savefile")	local CACHE_PARAM=${NAME}_PARAM_$2 ;;
 	*)						Log Error "Invalid cache parameter: $2"; return 2 ;;
 	esac
-	shift 2
-	eval $CACHE_PARAM=\""$@"\"
+	eval $CACHE_PARAM=\""$3"\"
 }
 
 GetCacheParam() {
-	if [ $# -ne 2 ]; then
-		Log Error "Invalid number of arguments for GetCacheParam!"
-		return 1
-	fi
+	[ $# -eq 2 ] || { Log Error "Invalid number of arguments for GetCacheParam!"; return 1; }
 	local NAME=CACHE_$1
 	case $2 in
 	"Autosave"|"Savefile")	local CACHE_PARAM=${NAME}_PARAM_$2 ;;
 	*)						Log Error "Invalid cache parameter: $2"; return 2 ;;
 	esac
-	shift 2
 	eval echo \"\$$CACHE_PARAM\"
 }
 
@@ -153,15 +137,12 @@ CreateCache() {
 }
 
 CacheLoad() {
-	if [ $# -lt 1 -o $# -gt 2 ]; then
-		Log Error "Invalid parameters count for CacheLoad!"
-	fi
-	local FILE=`GetCacheParam $1 Savefile`
-	if [ $# -eq 2 ]; then
-		local FILE=$2
-	fi
+	[ $# -eq 1 -o $# -eq 2 ] || { Log Error "Invalid parameters count for CacheLoad!"; return 0; }
+	local FILE=$2
+	[ $# -eq 1 ] && FILE=`GetCacheParam $1 Savefile`
 	local NAME=CACHE_$1
 	eval "$NAME=\"`cat $FILE 2>/dev/null`\""
+	return 0
 }
 
 CacheGetContent() {
@@ -170,13 +151,8 @@ CacheGetContent() {
 }
 
 CacheHit() {
-	if [ $# -ne 2 ]; then
-		Log Warning "Invalid parameters count for CacheHit!"
-		return 0
-	fi
-	if CacheCheck $1 $2; then
-		return 0
-	fi
+	[ $# -eq 2 ] || { Log Warning "Invalid parameters count for CacheHit!"; return 0; }
+	CacheCheck $1 $2 && return 0
 	local NAME=CACHE_$1
 	eval "$NAME=\"`CacheGetContent $1`$LINEFEED$2\""
 	if [ `GetCacheParam $1 Autosave` -ne 0 ]; then
@@ -186,28 +162,21 @@ CacheHit() {
 }
 
 CacheCheck() {
-	if [ $# -ne 1 ]; then
-		Log Warning "Invalid parameters count for CacheCheck!"
-		return 1
-	fi
+	[ $# -eq 2 ] || { Log Warning "Invalid parameters count for CacheCheck!"; return 1; }
 	CacheGetContent $1 | grep -Fx "$2" >/dev/null 2>/dev/null
 }
 
+SHSTUFF_LINUX_DISTRIB_ID=""
 GetLinuxDistributorId() {
-	if which lsb_release >/dev/null 2>/dev/null; then
-		lsb_release -is
-	else
-		Log Error "lsb_release utility not found!"
-		return 1
+	if [ -z "$SHSTUFF_LINUX_DISTRIB_ID" ]; then
+		which lsb_release >/dev/null 2>/dev/null || { Log Error "lsb_release utility not found!"; return 1; }
+		SHSTUFF_LINUX_DISTRIB_ID=`lsb_release -is`
 	fi
+	echo "$SHSTUFF_LINUX_DISTRIB_ID"
 }
 
-SHSTUFF_LINUX_DISTRIB_ID=""
 CheckLinuxPackage() {
-	if [ -z "$SHSTUFF_LINUX_DISTRIB_ID" ]; then
-		SHSTUFF_LINUX_DISTRIB_ID=`GetLinuxDistributorId`
-	fi
-	case $SHSTUFF_LINUX_DISTRIB_ID in
+	case `GetLinuxDistributorId` in
 	"Ubuntu")
 		dpkg -s $1 >/dev/null 2>/dev/null
 		;;
