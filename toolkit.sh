@@ -77,6 +77,7 @@ Log() {
 			echo>&2
 		fi
 	fi
+	return 0
 }
 
 Fail() {
