@@ -43,3 +43,27 @@ undo_Rm() { echo "There is no way to undo rm. =)"; return 1; }
 msg_DownloadFile() { echo "Downloading '$1' to '$2'"; }
 do_DownloadFile() { wget -P $2 $1; }
 undo_DownloadFile() { rm "$2/`basename $1`"; }
+
+msg_CheckPackages() { echo "Checking linux packages"; }
+do_CheckPackages() {
+	local PACKAGES_TO_INSTALL
+	local P
+	for P in "$@"; do
+		printf "%-32s" $P
+		if CheckLinuxPackage $P; then
+			printf 'OK\n'
+		else
+			printf 'Fail\n'
+			PACKAGES_TO_INSTALL="$PACKAGES_TO_INSTALL $P"
+		fi
+	done
+	if [ "$PACKAGES_TO_INSTALL" ]; then
+		echo "You should install the following packages:$PACKAGES_TO_INSTALL"
+		return 1
+	fi
+}
+undo_CheckPackages() { echo "Nothing to do"; }
+
+msg_SvnCheckout() { echo "Checking out '$1' to $2"; }
+do_SvnCheckout() { svn checkout $1 $2; }
+undo_SvnCheckout() { echo "Nothing to do"; }
