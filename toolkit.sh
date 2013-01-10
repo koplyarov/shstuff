@@ -133,7 +133,7 @@ GetCacheParam() {
 
 CreateCache() {
 	SetCacheParam $1 Autosave 0
-	SetCacheParam $1 Savefile ".cache_$1"
+	SetCacheParam $1 Savefile "`pwd`/.cache_$1"
 }
 
 CacheLoad() {
