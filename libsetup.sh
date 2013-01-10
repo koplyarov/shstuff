@@ -10,14 +10,18 @@ Exec() {
 	if [ "`GetSetupParam $SETUP_OBJ Verbose`" -eq "0" ]; then
 		Log Log_NoLineFeed "$MSG..."
 		local OUT;
-		if OUT=`eval do_$ACTION 2>&1`; then
+		local TMP_FILE;
+		TMP_FILE=`mktemp` || { Log Error "Could not create temp file for setup action output!"; return 1; }
+		eval do_$ACTION >$TMP_FILE 2>&1
+		local RES=$?
+		if [ $RES -eq 0 ]; then
 			Log Log_NoPreamble Log_ColoredMsg "OK"
-			return 0
 		else
 			Log Error Log_NoPreamble Log_ColoredMsg "Fail!"
-			Log Error "$OUT"
-			return 1
+			Log Error "`cat $TMP_FILE`"
 		fi
+		rm $TMP_FILE
+		return $RES
 	else
 		Log "$MSG..."
 		if eval do_$ACTION 2>&1; then
