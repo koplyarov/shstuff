@@ -44,10 +44,10 @@ Log() {
 			*)
 				if [ $NO_PREAMBLE -eq 0 ]; then
 					echo -e -n $COL_MAGENTA"{$LOGGER_SCRIPTNAME} "$MSGCOLOR"$LOGLEVEL">&2
-					if [ $COLORED_MSG -eq 0 ]; then
-						echo -e -n $COL_RESET>&2
-					fi
+					[ $COLORED_MSG -eq 0 ] && echo -e -n $COL_RESET>&2
 					local NO_PREAMBLE=1
+				else
+					[ $COLORED_MSG -eq 1 ] && echo -e -n $MSGCOLOR>&2
 				fi
 				echo -n " $ARG">&2
 				;;
