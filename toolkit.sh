@@ -161,6 +161,16 @@ CacheHit() {
 	return 0
 }
 
+CacheErase() {
+	[ $# -eq 2 ] || { Log Error "Invalid parameters count for CacheErase!"; return 1; }
+	CacheCheck $1 $2 || return 0
+	local NAME=CACHE_$1
+	eval "$NAME=\"`CacheGetContent $1 | grep -Fxv $2`\""
+	if [ `GetCacheParam $1 Autosave` -ne 0 ]; then
+		CacheGetContent $1 > `GetCacheParam $1 Savefile`
+	fi
+}
+
 CacheCheck() {
 	[ $# -eq 2 ] || { Log Warning "Invalid parameters count for CacheCheck!"; return 1; }
 	CacheGetContent $1 | grep -Fx "$2" >/dev/null 2>/dev/null
