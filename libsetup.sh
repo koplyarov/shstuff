@@ -9,7 +9,6 @@ Exec() {
 	local MSG=`eval msg_$ACTION`
 	if [ "`GetSetupParam $SETUP_OBJ Verbose`" -eq "0" ]; then
 		Log Log_NoLineFeed "$MSG..."
-		local OUT;
 		local TMP_FILE;
 		TMP_FILE=`mktemp` || { Log Error "Could not create temp file for setup action output!"; return 1; }
 		eval do_$ACTION >$TMP_FILE 2>&1
@@ -42,13 +41,16 @@ Revert() {
 	local MSG=`eval msg_$ACTION`
 	if [ "`GetSetupParam $SETUP_OBJ Verbose`" -eq "0" ]; then
 		Log Log_NoLineFeed "Reverting '$MSG'..."
-		local OUT;
-		if OUT=`eval undo_$ACTION 2>&1`; then
+		local TMP_FILE;
+		TMP_FILE=`mktemp` || { Log Error "Could not create temp file for setup action output!"; return 1; }
+		eval undo_$ACTION >$TMP_FILE 2>&1
+		if [ $? -eq 0 ]; then
 			Log Log_NoPreamble Log_ColoredMsg "OK"
 		else
 			Log Warning Log_NoPreamble Log_ColoredMsg "Fail!"
-			Log Warning "$OUT"
+			Log Warning "`cat $TMP_FILE`"
 		fi
+		rm $TMP_FILE
 	else
 		Log "Reverting '$MSG'..."
 		if eval undo_$ACTION 2>&1; then
