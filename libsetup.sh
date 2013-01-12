@@ -1,5 +1,6 @@
 #!/bin/bash
 
+LIBSETUP_NOTIFY=0
 
 Exec() {
 	local SETUP_OBJ=$1
@@ -14,9 +15,11 @@ Exec() {
 		local RES=$?
 		if [ $RES -eq 0 ]; then
 			Log Log_NoPreamble Log_ColoredMsg "OK"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG succeeded"
 		else
 			Log Error Log_NoPreamble Log_ColoredMsg "Fail!"
 			Log Error "`cat $TMP_FILE`"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG failed!"
 		fi
 		rm $TMP_FILE
 		return $RES
@@ -24,9 +27,11 @@ Exec() {
 		Log "$MSG..."
 		if eval do_$ACTION 2>&1; then
 			Log Log_ColoredMsg "OK"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG succeeded"
 			return 0
 		else
 			Log Error Log_ColoredMsg "Fail!"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG failed!"
 			return 1
 		fi
 	fi
@@ -44,17 +49,21 @@ Revert() {
 		eval undo_$ACTION >$TMP_FILE 2>&1
 		if [ $? -eq 0 ]; then
 			Log Log_NoPreamble Log_ColoredMsg "OK"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG succeeded"
 		else
 			Log Warning Log_NoPreamble Log_ColoredMsg "Fail!"
 			Log Warning "`cat $TMP_FILE`"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG failed!"
 		fi
 		rm $TMP_FILE
 	else
 		Log "Reverting '$MSG'..."
 		if eval undo_$ACTION 2>&1; then
 			Log Log_ColoredMsg "OK"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG succeeded"
 		else
 			Log Warning Log_ColoredMsg "Fail!"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG failed!"
 		fi
 	fi
 }
