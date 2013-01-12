@@ -106,6 +106,11 @@ ParseArguments() {
 	done
 }
 
+Notify() {
+	notify-send "$@"
+	return 0
+}
+
 CheckSuperuser() {
 	[ $UID -eq 0 ];
 }
