@@ -49,21 +49,21 @@ Revert() {
 		eval undo_$ACTION >$TMP_FILE 2>&1
 		if [ $? -eq 0 ]; then
 			Log Log_NoPreamble Log_ColoredMsg "OK"
-			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG succeeded"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "Reverting '$MSG' succeeded"
 		else
 			Log Warning Log_NoPreamble Log_ColoredMsg "Fail!"
 			Log Warning "`cat $TMP_FILE`"
-			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG failed!"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "Reverting '$MSG' failed!"
 		fi
 		rm $TMP_FILE
 	else
 		Log "Reverting '$MSG'..."
 		if eval undo_$ACTION 2>&1; then
 			Log Log_ColoredMsg "OK"
-			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG succeeded"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "Reverting '$MSG' succeeded"
 		else
 			Log Warning Log_ColoredMsg "Fail!"
-			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "$MSG failed!"
+			[ $LIBSETUP_NOTIFY -ne 0 ] && Notify "Reverting '$MSG' failed!"
 		fi
 	fi
 }
