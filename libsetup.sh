@@ -2,7 +2,6 @@
 
 
 Exec() {
-	local IFS=" "
 	local SETUP_OBJ=$1
 	shift
 	local ACTION="$@"
@@ -34,7 +33,6 @@ Exec() {
 }
 
 Revert() {
-	local IFS=" "
 	local SETUP_OBJ=$1
 	shift
 	local ACTION="$@"
@@ -91,17 +89,22 @@ Install() {
 	local ACTIONS
 	local UNWIND_ACTIONS
 	eval ACTIONS="\$$SETUP_OBJ"
-	local IFS="$LINEFEED"
+	local OLD_IFS="$IFS"
+	IFS="$LINEFEED"
 	for ACTION in $ACTIONS; do
+		IFS="$OLD_IFS"
 		if ! Exec $SETUP_OBJ "$ACTION"; then
 			IFS="$LINEFEED"
 			for UNWIND_ACTION in $UNWIND_ACTIONS; do
+				IFS="$OLD_IFS"
 				Revert $SETUP_OBJ "$UNWIND_ACTION"
 			done
+			IFS="$OLD_IFS"
 			return 1
 		fi
 		UNWIND_ACTIONS="${ACTION}${LINEFEED}${UNWIND_ACTIONS}"
 	done
+	IFS="$OLD_IFS"
 }
 
 Uninstall() {
@@ -109,13 +112,16 @@ Uninstall() {
 	local ACTIONS
 	local UNWIND_ACTIONS
 	eval ACTIONS="\$$SETUP_OBJ"
-	local IFS="$LINEFEED"
+	local OLD_IFS="$IFS"
+	IFS="$LINEFEED"
 	for ACTION in $ACTIONS; do
 		UNWIND_ACTIONS="${ACTION}${LINEFEED}${UNWIND_ACTIONS}"
 	done
 	for UNWIND_ACTION in $UNWIND_ACTIONS; do
+		IFS="$OLD_IFS"
 		Revert $SETUP_OBJ "$UNWIND_ACTION"
 	done
+	IFS="$OLD_IFS"
 }
 
 AddAction() {
