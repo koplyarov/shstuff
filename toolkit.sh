@@ -137,8 +137,16 @@ GetCacheParam() {
 
 
 CreateCache() {
-	SetCacheParam $1 Autosave 0
-	SetCacheParam $1 Savefile "`pwd`/.cache_$1"
+	[ $# -ge 1 ] || { Log Error "Invalid parameters count for CreateCache!"; return 0; }
+	local CACHE="$1"
+	SetCacheParam "$CACHE" Autosave 0
+	SetCacheParam "$CACHE" Savefile "`pwd`/.cache_$1"
+	shift
+	while [ $# -ge 2 ]; do
+		SetCacheParam "$CACHE" "$1" "$2"
+		shift 2
+	done
+	[ $# -eq 0 ] || { Log Error "Invalid parameters count for CreateCache!"; return 0; }
 }
 
 CacheLoad() {
