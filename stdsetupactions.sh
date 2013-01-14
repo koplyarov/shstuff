@@ -42,7 +42,7 @@ undo_Rm() { echo "There is no way to undo rm. =)"; return 1; }
 
 msg_DownloadFile() { echo "Downloading '$1' to '$2'"; }
 do_DownloadFile() { wget -O "$2" "$1"; }
-undo_DownloadFile() { rm "$2/`basename "$1"`"; }
+undo_DownloadFile() { rm "$2"; }
 
 msg_CheckPackages() { echo "Checking linux packages"; }
 do_CheckPackages() {
