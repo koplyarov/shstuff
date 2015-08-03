@@ -20,6 +20,10 @@ if [ $COLORED_LOGS -ne 0 ]; then
 	COL_CYAN=$ESC_SEQ"36;01m"
 fi
 
+MkTemp() {
+	mktemp -t "`basename "$0"`.XXXXXXXXXXXXXXXX"
+}
+
 RemoveDots() {
 	echo $* | sed 's@/\./@/@g' | sed 's@/\.$@@g'
 }
