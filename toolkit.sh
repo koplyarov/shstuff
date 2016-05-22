@@ -106,7 +106,7 @@ ParseArguments() {
 		[ $RESULT -eq 255 ] && { Log Error "Error handling argument #$ARGNUM ($1)!"; return 1; }
 		shift
 		shift $RESULT
-		ARGNUM=`echo "$ARGNUM+$RESULT+1" | bc`
+		ARGNUM=$(($ARGNUM+$RESULT+1))
 	done
 }
 
@@ -196,8 +196,12 @@ CacheCheck() {
 SHSTUFF_LINUX_DISTRIB_ID=""
 GetLinuxDistributorId() {
 	if [ -z "$SHSTUFF_LINUX_DISTRIB_ID" ]; then
-		which lsb_release >/dev/null 2>/dev/null || { Log Error "lsb_release utility not found!"; return 1; }
-		SHSTUFF_LINUX_DISTRIB_ID=`lsb_release -is`
+		if uname | grep -qi "mingw"; then
+			SHSTUFF_LINUX_DISTRIB_ID="mingw"
+		else
+			which lsb_release >/dev/null 2>/dev/null || { Log Error "lsb_release utility not found!"; return 1; }
+			SHSTUFF_LINUX_DISTRIB_ID=`lsb_release -is`
+		fi
 	fi
 	echo "$SHSTUFF_LINUX_DISTRIB_ID"
 }

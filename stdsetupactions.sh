@@ -3,8 +3,8 @@ do_MkDir() { [ -d $1 ] || mkdir $1; }
 undo_MkDir() { [ ! -d $1 ] || [ ! -z "`ls -1A $1`" ] || rm -r $1; }
 
 msg_Symlink() { echo "Creating $2 -> $1"; }
-do_Symlink() { ln -s $1 $2; }
-undo_Symlink() { [ "`readlink $2`" != "$1" ] || rm $2; }
+do_Symlink() { ln -s "$1" "$2"; }
+undo_Symlink() { [ `GetLinuxDistributorId` == "mingw" -o "`readlink $2`" == "$1" ] && rm -rf "$2"; }
 
 msg_Patch() { echo "Applying patch $3"; }
 do_Patch() {
